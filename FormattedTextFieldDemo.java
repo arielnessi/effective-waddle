@@ -38,6 +38,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.text.*;
 
+import model.Loan;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 
@@ -51,11 +53,9 @@ import java.text.*;
  */
 public class FormattedTextFieldDemo extends JPanel
                                     implements PropertyChangeListener {
+	
     //Values for the fields
-    private double amount = 100000;
-    private double rate = 7.5;  //7.5%
-    private int numPeriods = 30;
-
+    private Loan loan = new Loan();
     //Labels to identify the fields
     private JLabel amountLabel;
     private JLabel rateLabel;
@@ -82,9 +82,7 @@ public class FormattedTextFieldDemo extends JPanel
     public FormattedTextFieldDemo() {
         super(new BorderLayout());
         setUpFormats();
-        double payment = computePayment(amount,
-                                        rate,
-                                        numPeriods);
+        double payment = loan.computePayment();
 
         //Create the labels.
         amountLabel = new JLabel(amountString);
@@ -94,17 +92,17 @@ public class FormattedTextFieldDemo extends JPanel
 
         //Create the text fields and set them up.
         amountField = new JFormattedTextField(amountFormat);
-        amountField.setValue(new Double(amount));
+        amountField.setValue(new Double(loan.getAmount()));
         amountField.setColumns(10);
         amountField.addPropertyChangeListener("value", this);
 
         rateField = new JFormattedTextField(percentFormat);
-        rateField.setValue(new Double(rate));
+        rateField.setValue(new Double(loan.getRate()));
         rateField.setColumns(10);
         rateField.addPropertyChangeListener("value", this);
 
         numPeriodsField = new JFormattedTextField();
-        numPeriodsField.setValue(new Integer(numPeriods));
+        numPeriodsField.setValue(new Integer(loan.getNumPeriods()));
         numPeriodsField.setColumns(10);
         numPeriodsField.addPropertyChangeListener("value", this);
 
@@ -144,15 +142,21 @@ public class FormattedTextFieldDemo extends JPanel
     /** Called when a field's "value" property changes. */
     public void propertyChange(PropertyChangeEvent e) {
         Object source = e.getSource();
+        double	amount;
+        double	rate;
+        int		numPeriods;
         if (source == amountField) {
             amount = ((Number)amountField.getValue()).doubleValue();
+            loan.setAmount(amount);
         } else if (source == rateField) {
             rate = ((Number)rateField.getValue()).doubleValue();
+            loan.setRate(rate);
         } else if (source == numPeriodsField) {
             numPeriods = ((Number)numPeriodsField.getValue()).intValue();
+            loan.setNumPeriods(numPeriods);
         }
 
-        double payment = computePayment(amount, rate, numPeriods);
+        double payment = loan.computePayment();
         paymentField.setValue(new Double(payment));
     }
 
@@ -184,24 +188,6 @@ public class FormattedTextFieldDemo extends JPanel
                 createAndShowGUI();
             }
         });
-    }
-
-    //Compute the monthly payment based on the loan amount,
-    //APR, and length of loan.
-    double computePayment(double loanAmt, double rate, int numPeriods) {
-        double I, partial1, denominator, answer;
-
-        numPeriods *= 12;        //get number of months
-        if (rate > 0.01) {
-            I = rate / 100.0 / 12.0;         //get monthly rate from annual
-            partial1 = Math.pow((1 + I), (0.0 - numPeriods));
-            denominator = (1 - partial1) / I;
-        } else { //rate ~= 0
-            denominator = numPeriods;
-        }
-
-        answer = (-1 * loanAmt) / denominator;
-        return answer;
     }
 
     //Create and set up number formats. These objects also
