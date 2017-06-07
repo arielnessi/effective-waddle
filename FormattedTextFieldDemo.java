@@ -54,7 +54,19 @@ import java.text.*;
 public class FormattedTextFieldDemo extends JPanel
                                     implements PropertyChangeListener {
 	
-    //Values for the fields
+    private static final class AboutAction extends AbstractAction {
+		private AboutAction(String name) {
+			super(name);
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("New");
+			
+		}
+	}
+
+	//Values for the fields
     private Loan loan = new Loan();
     //Labels to identify the fields
     private JLabel amountLabel;
@@ -83,13 +95,13 @@ public class FormattedTextFieldDemo extends JPanel
         super(new BorderLayout());
         setUpFormats();
         double payment = loan.computePayment();
-
+        
         //Create the labels.
         amountLabel = new JLabel(amountString);
         rateLabel = new JLabel(rateString);
         numPeriodsLabel = new JLabel(numPeriodsString);
         paymentLabel = new JLabel(paymentString);
-
+        
         //Create the text fields and set them up.
         amountField = new JFormattedTextField(amountFormat);
         amountField.setValue(new Double(loan.getAmount()));
@@ -117,7 +129,9 @@ public class FormattedTextFieldDemo extends JPanel
         rateLabel.setLabelFor(rateField);
         numPeriodsLabel.setLabelFor(numPeriodsField);
         paymentLabel.setLabelFor(paymentField);
-
+        
+        //Lay out Menu
+        
         //Lay out the labels in a panel.
         JPanel labelPane = new JPanel(new GridLayout(0,1));
         labelPane.add(amountLabel);
@@ -169,10 +183,33 @@ public class FormattedTextFieldDemo extends JPanel
         //Create and set up the window.
         JFrame frame = new JFrame("FormattedTextFieldDemo");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        
+        //Action
+        AboutAction aboutAction = new AboutAction("About");
+        //Menu
+        JMenuItem file = new JMenuItem("Open");
+        JMenuItem properties = new JMenuItem("Teste");
+        JMenuItem help = new JMenuItem("About");
+        
+		JMenuItem aboutItem = new JMenuItem(aboutAction);
+        JMenuBar menu = new JMenuBar();
+        JMenu fileMenu = new JMenu("File");
+        JMenu propMenu = new JMenu("Properties");
+        JMenu helpMenu = new JMenu("Help");
+        
+        //Toolbar
+        JToolBar toolBar = new JToolBar("Dragable");
+        toolBar.add(new JButton("Teste"));
+        fileMenu.add(file);
+        propMenu.add(properties);
+        helpMenu.add(help);
+        menu.add(fileMenu);
+        menu.add(propMenu);
+        menu.add(helpMenu);
+        frame.setJMenuBar(menu);
         //Add contents to the window.
         frame.add(new FormattedTextFieldDemo());
-
+        frame.add(toolBar,BorderLayout.PAGE_START);
         //Display the window.
         frame.pack();
         frame.setVisible(true);
